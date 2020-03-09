@@ -32,17 +32,36 @@ def build_html(path, figure_list):
     with open(f"{path[:-5]}_Report.html", "wb") as f_output:
         f_output.write(soup.prettify("utf-8"))
 
-    # Insert images
-    for key, value in figure_list:
-        print(key, value)
-            
-        element = soup.find(text = key)
-        output_area_div = element.parent.parent
-                    
-        replacement = BeautifulSoup(f"<p><img src=\"{value}\" alt=\"{key}\"></p>", "html.parser")
+    # instantiate a chrome options object so you can set the size and headless preference
+    chrome_options = Options()
+    chrome_options.add_argument('--disable-features=VizDisplayCompositor')
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--window-size=1920x1080")
+    chrome_options.add_argument('--no-sandbox')
+    chrome_driver = ('/home/ray/Projects/P000024_Data_Management/chromedriver')
 
-        output_area_div.replace_with(replacement)  
+    url = f"file://{path}"
 
+    driver = webdriver.Chrome(options=chrome_options, executable_path=chrome_driver)
+    
+    try:
+        # Insert images        
+        elements = driver.find_elements_by_class_name('output')
+
+        indexer = 0
+
+        for element in elements:
+
+            replacement = BeautifulSoup(f"<p><img src=\"{figure_list[indexer]}\"></p>", "html.parser")
+            indexer += 1
+            element.replace_with(replacement)  
+        
+        print("write success")
+        driver.quit()
+    
+    except Exception as e:
+        print(e)
+        driver.quit()
     # # Insert notice
     # notice = BeautifulSoup("<p><div style=\"background-color: #f99a9a ; padding: 10px; border: 1px black;\"><b>NOTE: This document was generated procedurally and may have some formatting quirks.</div></p>", "html.parser")
     # print(type(notice))
@@ -75,21 +94,25 @@ def scrape(path):
     url = f"file://{path}"
 
     driver = webdriver.Chrome(options=chrome_options, executable_path=chrome_driver)
+    
     try:
         driver.get(url)
         
         # Get a list of all of the output cell elements
-        elements = driver.find_elements_by_class_name('output_prompt')
+        elements = driver.find_elements_by_class_name('output')
         
+        indexer = 0
+
         for element in elements:
 
-            # Remove punctuation from the output cell text (i.e. Out [2]: --> Out2)
-            trimmed_string = element.text.translate(str.maketrans('', '', string.punctuation))
+            # get element index
+            this_element_name = f"output{str(indexer)}"
+            indexer += 1
             
-            # Find the parent element and scroll to it
-            parent = element.find_element_by_xpath("./..")
-            actions = ActionChains(driver)
-            actions.move_to_element(parent).perform()
+            # # Find the parent element and scroll to it
+            # parent = element.find_element_by_xpath("./..")
+            # actions = ActionChains(driver)
+            # actions.move_to_element(parent).perform()
             
             elocation = element.location_once_scrolled_into_view
             location = parent.location_once_scrolled_into_view
@@ -108,11 +131,11 @@ def scrape(path):
             print(parent)
             print(location, size, left, right, top, bottom)
             im = im.crop((left, top, right, bottom)) # defines crop points
-            im.save(f"{trimmed_string}.png")
+            im.save(f"{this_element_name}.png")
             
-            figure_list.append((element.text, f"{trimmed_string}.png"))
+            figure_list.append( f"{this_element_name}.png")
             
-        print("Success")
+        print("read success")
         driver.quit()
 
         return figure_list
