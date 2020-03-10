@@ -73,23 +73,13 @@ done
 
 # Search Projects folder and create html versions of all Jupyter notebooks for
 # general consumption.
-# find /mnt/c/Users/ray/Sync/ -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/jupyter nbconvert {} --to html \;
+#find /mnt/c/Users/ray/Sync/Projects/P001230_BMRB_API_Test -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/jupyter nbconvert {} --to html \;
 
-# Search Projects folder and create docx versions of the html files that were
-# just generated. Since there are other html files in this folder, we'll just
-# run the same find query as before (i.e. looking for non-checkpoint ipynb 
-# files) and then replace the extensions using an in-line shell script and 
-# parameter expansion. Unlike nbconvert, this runs silently, so we'll tack on
-# a print parameter just so we know that things are working.i
-# 
-# pandoc is running out of memory as this command proceeds. I'm not sure how
-# to fix this right now--there might be a flag to increase the allocated 
-# memory or it might be a deeper problem (it seems to be a common issue with
-# Haskell programs). 
+# Create docx files from jupyter notebooks. This is not too easy to do in bash
+# so was offloaded to a py script that scrapes ipynbs using Selenium. 
+find /mnt/c/Users/ray/Sync/Projects/P001230_BMRB_API_Test -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/python /home/ray/Projects/P000024_Data_Management/ipynb_to_word.py --path={} \;
 
-find /mnt/c/Users/ray/Sync/ -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/python /home/ray/Projects/P000024_Data_Management/ipynb_to_word.py --path={} \;
-
-# Convert markdown meeting notes to PDF
+# Convert markdown meeting notes to docx
 find /mnt/c/Users/ray/Sync/Presentations -type f -name "*.md" -execdir /home/ray/anaconda3/bin/pandoc -s {} -o 'meeting_minutes.docx' \;
 
 ###############################################################################
