@@ -1,0 +1,6 @@
+/P001230_BMRB_API_Test/molprobity/
+/P001230_BMRB_API_Test/pacsy/
+/P001230_BMRB_API_Test/stride/
+*.html
+*.ipynb
+*.md
