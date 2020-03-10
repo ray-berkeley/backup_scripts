@@ -3,3 +3,4 @@
 !.gitignore
 !ipynb_to_wword.py
 !backup.sh
+!rsync-exclude.txt
