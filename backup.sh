@@ -71,6 +71,9 @@ done
 #                                                                             #
 ###############################################################################
 
+# Convert markdown meeting notes to docx
+find /mnt/c/Users/ray/Sync/Presentations -type f -name "*.md" -execdir /home/ray/anaconda3/bin/pandoc -s {} -o 'meeting_minutes.docx' \;
+
 # Search Projects folder and create html versions of all Jupyter notebooks for
 # general consumption.
 find /mnt/c/Users/ray/Sync/Projects/ -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/jupyter nbconvert {} --to html \;
@@ -78,10 +81,6 @@ find /mnt/c/Users/ray/Sync/Projects/ -type f -not -name "*checkpoint*" -name "*.
 # Create docx files from jupyter notebooks. This is not too easy to do in bash
 # so was offloaded to a py script that scrapes ipynbs using Selenium. 
 find /mnt/c/Users/ray/Sync/Projects/ -type f -not -name "*checkpoint*" -name "*.ipynb" -execdir /home/ray/anaconda3/bin/python /home/ray/Projects/P000024_Data_Management/ipynb_to_word.py --path={} \;
-
-# Convert markdown meeting notes to docx
-find /mnt/c/Users/ray/Sync/Presentations -type f -name "*.md" -execdir /home/ray/anaconda3/bin/pandoc -s {} -o 'meeting_minutes.docx' \;
-
 ###############################################################################
 #                                                                             #
 #                                 HDD BACKUP                                  #
@@ -169,7 +168,7 @@ rsync -ahv --progress /mnt/c/Users/ray/Sync/Presentations/Research_Updates/ /mnt
 # Journal Club Presentations
 rsync -ahv --progress /mnt/c/Users/ray/Sync/Presentations/Journal_Club/ /mnt/c/Users/ray/UC\ San\ Diego/Debelouchina\,\ Galia\ -\ Galia\ Lab/Group\ meetings\ -\ journal\ club\ presentations/Ray/
 
-# Projects folder to Data/Projects/
+# Projects folder to "Lab notebooks"
 rsync -ahv --progress --exclude-from='/mnt/c/Users/ray/Sync/Projects/.rsync-exclude.txt' /mnt/c/Users/ray/Sync/Projects/ /mnt/c/Users/ray/UC\ San\ Diego/Debelouchina\,\ Galia\ -\ Galia\ Lab/Lab\ notebooks/Ray/
 
 # Figures folder to Data/Figures/
